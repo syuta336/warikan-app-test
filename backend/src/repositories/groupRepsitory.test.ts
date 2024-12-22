@@ -12,7 +12,7 @@ describe("GroupRepository", () => {
     mockFs.existsSync.mockClear();
     mockFs.readFileSync.mockClear();
     mockFs.writeFileSync.mockClear();
-    repo = new GroupRepository("goups.json");
+    repo = new GroupRepository("groups.json");
   });
 
   describe("loadGroupos", () => {
@@ -32,6 +32,28 @@ describe("GroupRepository", () => {
       mockFs.readFileSync.mockReturnValueOnce(moskData);
       const result = repo.loadGroups();
       expect(result).toEqual(groups);
+    });
+
+    it("ファイルが存在しない場合は[]が返される。", () => {
+      mockFs.existsSync.mockReturnValueOnce(false);
+      const result = repo.loadGroups();
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("saveGroup", () => {
+    it("グループが保存される", () => {
+      const group: Group = {
+        name: "group1",
+        members: ["一郎", "二郎"],
+      };
+      mockFs.existsSync.mockReturnValueOnce(true);
+      mockFs.readFileSync.mockReturnValueOnce(JSON.stringify([]));
+      repo.saveGroup(group);
+      expect(mockFs.writeFileSync).toHaveBeenCalledWith(
+        "groups.json",
+        JSON.stringify([group])
+      );
     });
   });
 });
